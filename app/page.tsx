@@ -19,7 +19,7 @@ export default function Home() {
   const [portfolioData, setPortfolioData] = useState<PortfolioData>({
     name: "Abdee Raja Alfarizi",
     tagline: "Computer Science Student at Universitas Siliwangi",
-    profileImage: "/ale1.jpg?height=400&width=400",
+    profileImage: "/placeholder.svg?height=400&width=400",
     about:
       "I'm a passionate Computer Science student at Universitas Siliwangi with a focus on web development and UI/UX design. I love creating beautiful, functional websites and applications that solve real-world problems.",
     university: "Universitas Siliwangi, Computer Science",
