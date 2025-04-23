@@ -17,7 +17,7 @@ import type { PortfolioData } from "@/lib/types"
 
 export default function Home() {
   const [portfolioData, setPortfolioData] = useState<PortfolioData>({
-    name: "Abdee Raja Alfarizi",
+    name: "John Doe",
     tagline: "Computer Science Student at Universitas Siliwangi",
     profileImage: "/placeholder.svg?height=400&width=400",
     about:
@@ -26,7 +26,7 @@ export default function Home() {
     developerInfo: "Full-stack Developer specializing in React and Node.js",
     resumeUrl: "#",
     email: "ale.alfarizi12@gmail.com",
-    github: "github.com/alfarizi25",
+    github: "github.com/johndoe",
     skills: [
       { name: "HTML/CSS", level: 90 },
       { name: "JavaScript", level: 85 },
