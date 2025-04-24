@@ -476,7 +476,7 @@
              transition={{ duration: 0.6 }}
            >
              <h2 className="text-3xl font-bold leading-[1.1] tracking-tighter sm:text-3xl md:text-5xl">
-               Graphic Design
+               Design
              </h2>
              <p className="max-w-[85%] leading-normal text-zinc-500 sm:text-lg sm:leading-7">
                Showcasing my creative design work and visual storytelling
