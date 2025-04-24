@@ -11,123 +11,28 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { toast } from "@/components/ui/use-toast"
-import { submitContactForm } from "@/lib/actions"
+import { submitContactForm, getPortfolioData } from "@/lib/actions"
 import { motion, useInView, useScroll, useTransform } from "framer-motion"
 import type { PortfolioData } from "@/lib/types"
 
 export default function Home() {
-  const [portfolioData, setPortfolioData] = useState<PortfolioData>({
-    name: "Abdee Raja Alfarizi",
-    tagline: "Computer Science Student at Universitas Siliwangi",
-    profileImage: "/placeholder.svg?height=400&width=400",
-    about:
-      "I'm a passionate Computer Science student at Universitas Siliwangi with a focus on web development and UI/UX design. I love creating beautiful, functional websites and applications that solve real-world problems.",
-    university: "Universitas Siliwangi, Computer Science",
-    developerInfo: "Full-stack Developer specializing in React and Node.js",
-    resumeUrl: "#",
-    email: "ale.alfarizi12@gmail.com",
-    github: "github.com/alfarizi12",
-    skills: [
-      { name: "HTML/CSS", level: 90 },
-      { name: "JavaScript", level: 85 },
-      { name: "React", level: 80 },
-      { name: "Node.js", level: 75 },
-      { name: "UI/UX Design", level: 70 },
-      { name: "Python", level: 65 },
-      { name: "Database", level: 60 },
-      { name: "Mobile Dev", level: 50 },
-    ],
-    projects: [
-      {
-        title: "E-Learning Platform",
-        description: "A platform for online learning with video courses and quizzes.",
-        image: "/placeholder.svg?height=225&width=400",
-        technologies: ["React", "Node.js", "MongoDB"],
-        demoUrl: "#",
-        githubUrl: "#",
-      },
-      {
-        title: "Mr.Wash",
-        description: "Desain UI untuk aolikasi mobil panggilan, Mr.Wash",
-        image: "/mrwash.png?height=225&width=400",
-        technologies: ["Figma"],
-        demoUrl: "#",
-        githubUrl: "#",
-      },
-      {
-        title: "Portfolio Website",
-        description: "Personal portfolio website to showcase projects and skills.",
-        image: "/placeholder.svg?height=225&width=400",
-        technologies: ["Next.js", "Tailwind CSS"],
-        demoUrl: "#",
-        githubUrl: "#",
-      },
-    ],
-    graphicDesigns: [
-      {
-        title: "Brand Identity Design",
-        description: "Complete branding package including logo, color palette, and typography guidelines.",
-        image: "/placeholder.svg?height=400&width=400",
-        category: "Branding",
-        tools: ["Adobe Illustrator", "Adobe Photoshop"],
-        client: "Local Cafe",
-        date: "2023-12-10",
-      },
-      {
-        title: "Event Poster Series",
-        description: "Set of promotional posters for a university music festival.",
-        image: "/placeholder.svg?height=400&width=400",
-        category: "Print Design",
-        tools: ["Adobe Photoshop", "Adobe InDesign"],
-        client: "Universitas Siliwangi",
-        date: "2023-08-15",
-      },
-      {
-        title: "Social Media Campaign",
-        description: "Visual content for Instagram and Facebook promotional campaign.",
-        image: "/placeholder.svg?height=400&width=400",
-        category: "Digital Design",
-        tools: ["Adobe Photoshop", "Figma"],
-        client: "Local Business",
-        date: "2024-01-20",
-      },
-      {
-        title: "Mobile App UI Design",
-        description: "User interface design for a food delivery application.",
-        image: "/placeholder.svg?height=400&width=400",
-        category: "UI/UX Design",
-        tools: ["Figma", "Adobe XD"],
-        date: "2023-11-05",
-      },
-    ],
-    socialLinks: [
-      { name: "GitHub", url: "#" },
-      { name: "LinkedIn", url: "#" },
-      { name: "Twitter", url: "#" },
-      { name: "Instagram", url: "#" },
-    ],
-    messages: [],
-  })
-
+  const [portfolioData, setPortfolioData] = useState<PortfolioData | null>(null)
   const [contactForm, setContactForm] = useState({
     name: "",
     email: "",
     message: "",
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [activeCategory, setActiveCategory] = useState("All")
 
   // Animation refs
   const aboutRef = useRef(null)
   const skillsRef = useRef(null)
   const projectsRef = useRef(null)
-  const designsRef = useRef(null)
   const contactRef = useRef(null)
 
   const aboutInView = useInView(aboutRef, { once: true, amount: 0.3 })
   const skillsInView = useInView(skillsRef, { once: true, amount: 0.3 })
   const projectsInView = useInView(projectsRef, { once: true, amount: 0.3 })
-  const designsInView = useInView(designsRef, { once: true, amount: 0.3 })
   const contactInView = useInView(contactRef, { once: true, amount: 0.3 })
 
   // Parallax effect for hero section
@@ -135,27 +40,13 @@ export default function Home() {
   const heroY = useTransform(scrollYProgress, [0, 0.5], [0, -100])
 
   useEffect(() => {
-    // Try to load data from localStorage first for better UX
-    const savedData = localStorage.getItem("portfolioData")
-    if (savedData) {
-      try {
-        setPortfolioData(JSON.parse(savedData))
-      } catch (e) {
-        console.error("Error parsing saved data:", e)
-        fetchPortfolioData() // Fallback to API
-      }
-    } else {
-      fetchPortfolioData()
-    }
+    fetchPortfolioData()
   }, [])
 
   const fetchPortfolioData = async () => {
     try {
-      const response = await fetch("/api/portfolio")
-      if (response.ok) {
-        const data = (await response.json()) as PortfolioData
-        setPortfolioData(data)
-      }
+      const data = await getPortfolioData()
+      setPortfolioData(data)
     } catch (error) {
       console.error("Error fetching portfolio data:", error)
     }
@@ -173,11 +64,16 @@ export default function Home() {
     setIsSubmitting(true)
 
     try {
+      toast({
+        title: "Sending message...",
+        description: "Please wait while we process your message.",
+      })
+
       const result = await submitContactForm({
         name: contactForm.name,
         email: contactForm.email,
         message: contactForm.message,
-        recipientEmail: "ale.alfarizi12@gmail.com",
+        recipientEmail: portfolioData?.email || "ale.alfarizi12@gmail.com",
       })
 
       if (result.success) {
@@ -195,6 +91,7 @@ export default function Home() {
         throw new Error(result.message)
       }
     } catch (error) {
+      console.error("Contact form error:", error)
       toast({
         title: "Error",
         description: "There was a problem sending your message. Please try again.",
@@ -205,14 +102,16 @@ export default function Home() {
     }
   }
 
-  // Get unique design categories for filter
-  const designCategories = ["All", ...new Set(portfolioData.graphicDesigns.map((design) => design.category))]
-
-  // Filter designs by active category
-  const filteredDesigns =
-    activeCategory === "All"
-      ? portfolioData.graphicDesigns
-      : portfolioData.graphicDesigns.filter((design) => design.category === activeCategory)
+  if (!portfolioData) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold mb-2">Loading...</h2>
+          <p className="text-muted-foreground">Please wait while we load the portfolio</p>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -466,113 +365,6 @@ export default function Home() {
                         </Button>
                       )}
                     </div>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            ))}
-          </motion.div>
-        </div>
-      </motion.section>
-
-      {/* Graphic Design Portfolio Section */}
-      <motion.section id="designs" className="w-full py-12 md:py-24 lg:py-32 bg-zinc-50" ref={designsRef}>
-        <div className="container px-4 md:px-6">
-          <motion.div
-            className="mx-auto flex max-w-[58rem] flex-col items-center justify-center gap-4 text-center"
-            initial={{ y: 50, opacity: 0 }}
-            animate={designsInView ? { y: 0, opacity: 1 } : { y: 50, opacity: 0 }}
-            transition={{ duration: 0.6 }}
-          >
-            <h2 className="text-3xl font-bold leading-[1.1] tracking-tighter sm:text-3xl md:text-5xl">
-              Graphic Design
-            </h2>
-            <p className="max-w-[85%] leading-normal text-zinc-500 sm:text-lg sm:leading-7">
-              Showcasing my creative design work and visual storytelling
-            </p>
-          </motion.div>
-
-          {/* Category Filter */}
-          <motion.div
-            className="flex flex-wrap justify-center gap-2 mt-8"
-            initial={{ y: 30, opacity: 0 }}
-            animate={designsInView ? { y: 0, opacity: 1 } : { y: 30, opacity: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-          >
-            {designCategories.map((category, index) => (
-              <Button
-                key={index}
-                variant={activeCategory === category ? "default" : "outline"}
-                size="sm"
-                onClick={() => setActiveCategory(category)}
-                className="transition-all duration-300 hover:scale-[1.02]"
-              >
-                {category}
-              </Button>
-            ))}
-          </motion.div>
-
-          {/* Design Grid */}
-          <motion.div
-            className="mx-auto mt-12 grid max-w-6xl gap-8 sm:grid-cols-2 lg:grid-cols-3"
-            initial={{ y: 50, opacity: 0 }}
-            animate={designsInView ? { y: 0, opacity: 1 } : { y: 50, opacity: 0 }}
-            transition={{ duration: 0.6, delay: 0.3 }}
-          >
-            {filteredDesigns.map((design, index) => (
-              <motion.div
-                key={index}
-                whileHover={{
-                  scale: 1.03,
-                  boxShadow: "0 10px 30px -15px rgba(0, 0, 0, 0.2)",
-                  transition: { duration: 0.2 },
-                }}
-                initial={{ opacity: 0, y: 20 }}
-                animate={designsInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-                transition={{ duration: 0.5, delay: 0.1 * index }}
-                className="transition-all duration-300"
-              >
-                <Card className="overflow-hidden backdrop-blur-sm bg-white/10 border-white/20 h-full">
-                  <div className="aspect-square w-full overflow-hidden">
-                    <Image
-                      src={design.image || "/placeholder.svg?height=400&width=400"}
-                      alt={design.title}
-                      width={400}
-                      height={400}
-                      className="object-cover transition-all hover:scale-105"
-                    />
-                  </div>
-                  <CardContent className="p-6">
-                    <div className="flex items-center justify-between mb-2">
-                      <h3 className="text-xl font-bold">{design.title}</h3>
-                      <span className="inline-flex items-center rounded-full bg-zinc-100 px-2.5 py-0.5 text-xs font-semibold">
-                        {design.category}
-                      </span>
-                    </div>
-                    <p className="text-sm text-zinc-500 mt-2">{design.description}</p>
-
-                    {design.client && (
-                      <p className="text-sm mt-4">
-                        <span className="font-medium">Client:</span> {design.client}
-                      </p>
-                    )}
-
-                    <div className="mt-3 flex flex-wrap gap-2">
-                      {design.tools.map((tool, toolIndex) => (
-                        <span
-                          key={toolIndex}
-                          className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors hover:bg-zinc-100"
-                        >
-                          {tool}
-                        </span>
-                      ))}
-                    </div>
-
-                    <p className="text-xs text-zinc-400 mt-4">
-                      {new Date(design.date).toLocaleDateString("en-US", {
-                        year: "numeric",
-                        month: "long",
-                      })}
-                    </p>
                   </CardContent>
                 </Card>
               </motion.div>
