@@ -47,18 +47,6 @@
          githubUrl: "#",
        },
        {
-         title: "Weather App",
-         description: "Real-time weather application with forecast and location tracking.",
-         image: "/placeholder.svg?height=225&width=400",
-         technologies: ["JavaScript", "API", "CSS"],
-         title: "Mr.Wash",
-         description: "Desain UI untuk aolikasi mobil panggilan, Mr.Wash",
-         image: "/mrwash.png?height=225&width=400",
-         technologies: ["Figma"],
-         demoUrl: "#",
-         githubUrl: "#",
-       },
-       {
          title: "Portfolio Website",
          description: "Personal portfolio website to showcase projects and skills.",
          image: "/placeholder.svg?height=225&width=400",
