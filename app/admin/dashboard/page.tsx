@@ -327,35 +327,51 @@ export default function AdminDashboard() {
     try {
       const formData = new FormData()
       formData.append("file", file)
+      formData.append("section", "profile") // Add section information
+
+      console.log("Uploading profile image:", file.name)
 
       const response = await fetch("/api/upload", {
         method: "POST",
         body: formData,
       })
 
-      if (!response.ok) {
-        throw new Error("Failed to upload image")
-      }
-
       const result = await response.json()
 
+      if (!response.ok) {
+        throw new Error(result.message || "Failed to upload image")
+      }
+
       if (result.success && portfolioData) {
+        console.log("Profile image uploaded successfully:", result.filepath)
+
+        // Update state dengan URL gambar baru
         setPortfolioData({
           ...portfolioData,
           profileImage: result.filepath,
         })
 
+        // Simpan perubahan ke database
+        const saveResult = await updatePortfolioData({
+          profileImage: result.filepath,
+        })
+
+        if (!saveResult.success) {
+          throw new Error("Failed to save profile image URL to database")
+        }
+
         toast({
           title: "Image uploaded",
-          description: "Profile image uploaded successfully",
+          description: "Profile image uploaded and saved successfully",
         })
       } else {
-        throw new Error(result.message)
+        throw new Error(result.message || "Unknown error during upload")
       }
     } catch (error) {
+      console.error("Profile image upload error:", error)
       toast({
         title: "Upload failed",
-        description: "Failed to upload profile image",
+        description: error instanceof Error ? error.message : "Failed to upload profile image",
         variant: "destructive",
       })
     }
@@ -366,6 +382,7 @@ export default function AdminDashboard() {
 
     const formData = new FormData()
     formData.append("file", file)
+    formData.append("section", `project-${index}`) // Add section with project index
 
     try {
       const response = await fetch("/api/upload", {
@@ -412,6 +429,7 @@ export default function AdminDashboard() {
 
     const formData = new FormData()
     formData.append("file", file)
+    formData.append("section", `design-${index}`) // Add section with design index
 
     try {
       const response = await fetch("/api/upload", {
