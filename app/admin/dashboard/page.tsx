@@ -15,7 +15,7 @@ import { PlusCircle, Save, Trash2, LogOut, Check } from "lucide-react"
 import { FileUpload } from "@/components/file-upload"
 import { createSupabaseClient } from "@/lib/supabase"
 import { getPortfolioData, updatePortfolioData, getContactMessages, markMessageAsRead } from "@/lib/actions"
-import type { PortfolioData, SkillItem, ProjectItem, SocialLink, GraphicDesignItem } from "@/lib/types"
+import type { PortfolioData, SkillItem, ProjectItem, SocialLink } from "@/lib/types"
 
 export default function AdminDashboard() {
   const router = useRouter()
@@ -235,57 +235,6 @@ export default function AdminDashboard() {
     })
   }
 
-  // Graphic Designs section handlers
-  const handleDesignChange = (index: number, field: string, value: string) => {
-    if (!portfolioData) return
-
-    const updatedDesigns = [...portfolioData.graphicDesigns]
-    if (field === "tools") {
-      updatedDesigns[index] = {
-        ...updatedDesigns[index],
-        tools: value.split(",").map((tool) => tool.trim()),
-      }
-    } else {
-      updatedDesigns[index] = {
-        ...updatedDesigns[index],
-        [field]: value,
-      }
-    }
-    setPortfolioData({
-      ...portfolioData,
-      graphicDesigns: updatedDesigns,
-    })
-  }
-
-  const handleAddDesign = () => {
-    if (!portfolioData) return
-
-    const newDesign: GraphicDesignItem = {
-      title: "New Design",
-      description: "Design description",
-      image: "/placeholder.svg?height=400&width=400",
-      category: "Digital Design",
-      tools: ["Adobe Photoshop"],
-      date: new Date().toISOString().split("T")[0],
-    }
-
-    setPortfolioData({
-      ...portfolioData,
-      graphicDesigns: [...portfolioData.graphicDesigns, newDesign],
-    })
-  }
-
-  const handleRemoveDesign = (index: number) => {
-    if (!portfolioData) return
-
-    const updatedDesigns = [...portfolioData.graphicDesigns]
-    updatedDesigns.splice(index, 1)
-    setPortfolioData({
-      ...portfolioData,
-      graphicDesigns: updatedDesigns,
-    })
-  }
-
   // Social links handlers
   const handleSocialLinkChange = (index: number, field: string, value: string) => {
     if (!portfolioData) return
@@ -327,35 +276,51 @@ export default function AdminDashboard() {
     try {
       const formData = new FormData()
       formData.append("file", file)
+      formData.append("section", "profile") // Add section information
+
+      console.log("Uploading profile image:", file.name)
 
       const response = await fetch("/api/upload", {
         method: "POST",
         body: formData,
       })
 
-      if (!response.ok) {
-        throw new Error("Failed to upload image")
-      }
-
       const result = await response.json()
 
+      if (!response.ok) {
+        throw new Error(result.message || "Failed to upload image")
+      }
+
       if (result.success && portfolioData) {
+        console.log("Profile image uploaded successfully:", result.filepath)
+
+        // Update state dengan URL gambar baru
         setPortfolioData({
           ...portfolioData,
           profileImage: result.filepath,
         })
 
+        // Simpan perubahan ke database
+        const saveResult = await updatePortfolioData({
+          profileImage: result.filepath,
+        })
+
+        if (!saveResult.success) {
+          throw new Error("Failed to save profile image URL to database")
+        }
+
         toast({
           title: "Image uploaded",
-          description: "Profile image uploaded successfully",
+          description: "Profile image uploaded and saved successfully",
         })
       } else {
-        throw new Error(result.message)
+        throw new Error(result.message || "Unknown error during upload")
       }
     } catch (error) {
+      console.error("Profile image upload error:", error)
       toast({
         title: "Upload failed",
-        description: "Failed to upload profile image",
+        description: error instanceof Error ? error.message : "Failed to upload profile image",
         variant: "destructive",
       })
     }
@@ -366,6 +331,7 @@ export default function AdminDashboard() {
 
     const formData = new FormData()
     formData.append("file", file)
+    formData.append("section", `project-${index}`) // Add section with project index
 
     try {
       const response = await fetch("/api/upload", {
@@ -407,52 +373,6 @@ export default function AdminDashboard() {
     }
   }
 
-  const handleDesignImageUpload = async (file: File, index: number) => {
-    if (!portfolioData) return
-
-    const formData = new FormData()
-    formData.append("file", file)
-
-    try {
-      const response = await fetch("/api/upload", {
-        method: "POST",
-        body: formData,
-      })
-
-      if (!response.ok) {
-        throw new Error("Failed to upload image")
-      }
-
-      const result = await response.json()
-
-      if (result.success) {
-        const updatedDesigns = [...portfolioData.graphicDesigns]
-        updatedDesigns[index] = {
-          ...updatedDesigns[index],
-          image: result.filepath,
-        }
-
-        setPortfolioData({
-          ...portfolioData,
-          graphicDesigns: updatedDesigns,
-        })
-
-        toast({
-          title: "Image uploaded",
-          description: "Design image uploaded successfully",
-        })
-      } else {
-        throw new Error(result.message)
-      }
-    } catch (error) {
-      toast({
-        title: "Upload failed",
-        description: "Failed to upload design image",
-        variant: "destructive",
-      })
-    }
-  }
-
   if (!portfolioData) {
     return (
       <div className="container py-10 flex items-center justify-center min-h-[calc(100vh-4rem)]">
@@ -488,7 +408,7 @@ export default function AdminDashboard() {
       </div>
 
       <Tabs defaultValue="profile" className="w-full">
-        <TabsList className="grid w-full grid-cols-7">
+        <TabsList className="grid w-full grid-cols-6">
           <TabsTrigger
             value="profile"
             className="transition-all duration-300 data-[state=active]:bg-zinc-900 data-[state=active]:text-white"
@@ -512,12 +432,6 @@ export default function AdminDashboard() {
             className="transition-all duration-300 data-[state=active]:bg-zinc-900 data-[state=active]:text-white"
           >
             Projects
-          </TabsTrigger>
-          <TabsTrigger
-            value="designs"
-            className="transition-all duration-300 data-[state=active]:bg-zinc-900 data-[state=active]:text-white"
-          >
-            Designs
           </TabsTrigger>
           <TabsTrigger
             value="contact"
@@ -792,126 +706,6 @@ export default function AdminDashboard() {
               </div>
               <Button className="mt-6 transition-all duration-300 hover:scale-[1.02]" onClick={handleSaveAll}>
                 Save Projects
-              </Button>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        {/* Graphic Designs Tab */}
-        <TabsContent value="designs" className="space-y-4 py-4">
-          <Card className="backdrop-blur-sm bg-white/10 border-white/20 transition-all duration-500 hover:shadow-md">
-            <CardHeader>
-              <CardTitle>Graphic Designs</CardTitle>
-              <CardDescription>Manage your graphic design portfolio items</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-6">
-                {portfolioData.graphicDesigns.map((design, index) => (
-                  <Card
-                    key={index}
-                    className="backdrop-blur-sm bg-white/5 border-white/10 transition-all duration-500 hover:shadow-md"
-                  >
-                    <CardHeader className="p-4">
-                      <div className="flex items-center justify-between">
-                        <CardTitle className="text-lg">{design.title}</CardTitle>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => handleRemoveDesign(index)}
-                          className="text-red-500 transition-all duration-300 hover:bg-red-100"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </CardHeader>
-                    <CardContent className="p-4 pt-0 space-y-4">
-                      <div className="grid gap-2">
-                        <Label htmlFor={`design-title-${index}`}>Design Title</Label>
-                        <Input
-                          id={`design-title-${index}`}
-                          value={design.title}
-                          onChange={(e) => handleDesignChange(index, "title", e.target.value)}
-                          className="bg-white/50 transition-all duration-300 focus:bg-white/80"
-                        />
-                      </div>
-                      <div className="grid gap-2">
-                        <Label htmlFor={`design-desc-${index}`}>Description</Label>
-                        <Textarea
-                          id={`design-desc-${index}`}
-                          value={design.description}
-                          onChange={(e) => handleDesignChange(index, "description", e.target.value)}
-                          className="bg-white/50 transition-all duration-300 focus:bg-white/80"
-                        />
-                      </div>
-                      <div className="grid gap-2">
-                        <Label htmlFor={`design-image-${index}`}>Design Image</Label>
-                        <div className="flex items-center gap-4">
-                          <div className="h-24 w-24 overflow-hidden rounded-md bg-muted">
-                            <img
-                              src={design.image || "/placeholder.svg?height=96&width=96"}
-                              alt="Design"
-                              className="h-full w-full object-cover"
-                            />
-                          </div>
-                          <FileUpload
-                            onUpload={(file) => handleDesignImageUpload(file, index)}
-                            label="Upload New Image"
-                          />
-                        </div>
-                      </div>
-                      <div className="grid gap-2">
-                        <Label htmlFor={`design-category-${index}`}>Category</Label>
-                        <Input
-                          id={`design-category-${index}`}
-                          value={design.category}
-                          onChange={(e) => handleDesignChange(index, "category", e.target.value)}
-                          className="bg-white/50 transition-all duration-300 focus:bg-white/80"
-                        />
-                      </div>
-                      <div className="grid gap-2">
-                        <Label htmlFor={`design-tools-${index}`}>Tools Used</Label>
-                        <Input
-                          id={`design-tools-${index}`}
-                          value={design.tools.join(", ")}
-                          onChange={(e) => handleDesignChange(index, "tools", e.target.value)}
-                          className="bg-white/50 transition-all duration-300 focus:bg-white/80"
-                        />
-                      </div>
-                      <div className="grid grid-cols-2 gap-4">
-                        <div className="grid gap-2">
-                          <Label htmlFor={`design-client-${index}`}>Client (Optional)</Label>
-                          <Input
-                            id={`design-client-${index}`}
-                            value={design.client || ""}
-                            onChange={(e) => handleDesignChange(index, "client", e.target.value)}
-                            className="bg-white/50 transition-all duration-300 focus:bg-white/80"
-                          />
-                        </div>
-                        <div className="grid gap-2">
-                          <Label htmlFor={`design-date-${index}`}>Date</Label>
-                          <Input
-                            id={`design-date-${index}`}
-                            type="date"
-                            value={design.date.split("T")[0]}
-                            onChange={(e) => handleDesignChange(index, "date", e.target.value)}
-                            className="bg-white/50 transition-all duration-300 focus:bg-white/80"
-                          />
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-                <Button
-                  variant="outline"
-                  className="transition-all duration-300 hover:scale-[1.02]"
-                  onClick={handleAddDesign}
-                >
-                  <PlusCircle className="mr-2 h-4 w-4" />
-                  Add New Design
-                </Button>
-              </div>
-              <Button className="mt-6 transition-all duration-300 hover:scale-[1.02]" onClick={handleSaveAll}>
-                Save Designs
               </Button>
             </CardContent>
           </Card>
