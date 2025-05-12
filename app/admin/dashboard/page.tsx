@@ -327,6 +327,9 @@ export default function AdminDashboard() {
     try {
       const formData = new FormData()
       formData.append("file", file)
+      formData.append("section", "profile") // Add section information
+
+      console.log("Uploading profile image:", file.name)
 
       console.log("Uploading profile image:", file.name)
 
@@ -381,6 +384,7 @@ export default function AdminDashboard() {
 
     const formData = new FormData()
     formData.append("file", file)
+    formData.append("section", `project-${index}`) // Add section with project index
 
     try {
       const response = await fetch("/api/upload", {
@@ -427,6 +431,7 @@ export default function AdminDashboard() {
 
     const formData = new FormData()
     formData.append("file", file)
+    formData.append("section", `design-${index}`) // Add section with design index
 
     try {
       const response = await fetch("/api/upload", {
