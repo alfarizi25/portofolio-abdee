@@ -31,7 +31,7 @@ export function Footer() {
           <div className="flex justify-center space-x-6 mb-8">
             {[
               { icon: Github, href: "https://github.com/alfarizi25", label: "GitHub" },
-              { icon: Linkedin, href: "https://www.linkedin.com/in/abdee-raja-alfarizi", label: "LinkedIn" },
+              { icon: Linkedin, href: "https://www.linkedin.com/in/abdee-alfarizi2507", label: "LinkedIn" },
               { icon: Mail, href: "mailto:ale.alfarizi12@gmail.com", label: "Email" },
             ].map(({ icon: Icon, href, label }) => (
               <motion.a
