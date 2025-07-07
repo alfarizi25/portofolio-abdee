@@ -7,13 +7,13 @@ import { Toaster } from "@/components/ui/toaster"
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "Abdee Raja Alfarizi - Full Stack Developer & Designer",
+  title: "Abdee Raja Alfarizi | Frontend Developer & Graphic Designer",
   description:
     "Portfolio website of Abdee Raja Alfarizi, a passionate full-stack developer and UI/UX designer specializing in modern web technologies.",
   keywords: "full stack developer, UI/UX designer, React, Next.js, TypeScript, portfolio",
   authors: [{ name: "Abdee Raja Alfarizi" }],
   openGraph: {
-    title: "Abdee Raja Alfarizi - Full Stack Developer & Designer",
+    title: "Abdee Raja Alfarizi | Frontend Developer & Graphic Designer",
     description: "Portfolio website showcasing projects and skills in web development and design.",
     type: "website",
     locale: "en_US",
