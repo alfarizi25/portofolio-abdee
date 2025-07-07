@@ -23,7 +23,7 @@ export function Footer() {
               </span>
             </h3>
             <p className="text-gray-600 max-w-md mx-auto">
-              Full Stack Developer & UI/UX Designer passionate about creating digital experiences that make a
+              Frontend Developer & Graphic Designer passionate about creating digital experiences that make a
               difference.
             </p>
           </div>

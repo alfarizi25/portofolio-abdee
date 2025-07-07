@@ -1,6 +1,7 @@
 "use client"
 
 import { motion } from "framer-motion"
+import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { ArrowDown, Github, Linkedin, Mail } from "lucide-react"
 
@@ -60,19 +61,23 @@ export function HeroSection() {
           transition={{ duration: 0.8, delay: 0.2 }}
           className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12"
         >
-          <Button
-            size="lg"
-            className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-8 py-3 rounded-full transition-all duration-300 transform hover:scale-105"
-          >
-            View My Work
-          </Button>
-          <Button
-            variant="outline"
-            size="lg"
-            className="bg-white/10 backdrop-blur-sm border-white/20 hover:bg-white/20 px-8 py-3 rounded-full transition-all duration-300"
-          >
-            Get In Touch
-          </Button>
+          <Link href="#projects">
+            <Button
+              size="lg"
+              className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-8 py-3 rounded-full transition-all duration-300 transform hover:scale-105"
+            >
+              View My Work
+            </Button>
+          </Link>
+          <Link href="#contact">
+            <Button
+              variant="outline"
+              size="lg"
+              className="bg-white/10 backdrop-blur-sm border-white/20 hover:bg-white/20 px-8 py-3 rounded-full transition-all duration-300"
+            >
+              Get In Touch
+            </Button>
+          </Link>
         </motion.div>
 
         <motion.div

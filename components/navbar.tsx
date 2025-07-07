@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import Link from "next/link"
+import Image from "next/image" // <-- Tambahkan impor ini
 import { Button } from "@/components/ui/button"
 import { Menu, X, User } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
@@ -40,9 +41,11 @@ export function Navbar() {
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent"
           >
-            AR
+            {/* Ganti teks dengan komponen Image */}
+            <Link href="/" className="flex items-center">
+              <Image src="/logoT2.png" alt="Logo" width={40} height={40} />
+            </Link>
           </motion.div>
 
           {/* Desktop Menu */}
