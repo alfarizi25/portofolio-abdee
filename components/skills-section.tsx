@@ -20,7 +20,7 @@ export function SkillsSection() {
         { name: "TypeScript", level: 88, icon: "📘", description: "Type-safe JavaScript development" },
         { name: "Tailwind CSS", level: 92, icon: "🎨", description: "Utility-first CSS framework" },
         { name: "Framer Motion", level: 85, icon: "🎭", description: "Animation library for React" },
-        { name: "Vue.js", level: 80, icon: "💚", description: "Progressive JavaScript framework" },
+
       ],
     },
     {
@@ -32,8 +32,6 @@ export function SkillsSection() {
         { name: "Adobe Illustrator", level: 85, icon: "🅰️", description: "Vector graphics and logo design" },
         { name: "Canva", level: 95, icon: "🎨", description: "Quick design and social media graphics" },
         { name: "Figma", level: 80, icon: "🎯", description: "UI/UX design and prototyping" },
-        { name: "UI Design", level: 75, icon: "📱", description: "User interface design principles" },
-        { name: "Graphic Design", level: 88, icon: "🖼️", description: "Visual communication and branding" },
       ],
     },
   ]
