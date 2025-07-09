@@ -93,7 +93,7 @@ export function SkillsSection() {
         >
           <h2 className="text-4xl md:text-6xl font-bold mb-6">
             <span className="bg-gradient-to-r from-blue-600 via-indigo-600 to-sky-600 bg-clip-text text-transparent">
-              Skills & Technologies
+              Skills
             </span>
           </h2>
           <p className="text-gray-600 text-xl max-w-3xl mx-auto leading-relaxed">
